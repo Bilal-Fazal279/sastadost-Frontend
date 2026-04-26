@@ -1,101 +1,159 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import axios from 'axios';
-import './App.css';
+
+import Navbar from './components/Navbar';
+import SearchHero from './components/SearchHero';
+import ProductCard from './components/ProductCard';
+import { SkeletonGrid } from './components/SkeletonCard';
+import SortDropdown from './components/SortDropdown';
 
 function App() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [sortOrder, setSortOrder] = useState('default');
+  const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSearch = async () => {
-    if (!query) return;
+  const handleSearch = async (overrideQuery) => {
+    const q = overrideQuery || query;
+    if (!q.trim()) return;
     setLoading(true);
+    setError(null);
+    setHasSearched(true);
     try {
-      const response = await axios.get(`http://localhost:5000/api/search?q=${query}`);
-      console.log("response is: ", response);
-      setResults(response.data);
+      const response = await axios.get(
+        `http://localhost:5000/api/search?q=${encodeURIComponent(q)}`
+      );
+      setResults(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
-      console.error("Search failed", err);
+      console.error('Search failed:', err);
+      setError('Could not connect to backend. Make sure your server is running on port 5000.');
+      setResults([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
+  const handleChipClick = (chipQuery) => {
+    setQuery(chipQuery);
+    handleSearch(chipQuery);
+  };
+
+  const sortedResults = useMemo(() => {
+    if (sortOrder === 'asc') {
+      return [...results].sort((a, b) => (a.current_price ?? Infinity) - (b.current_price ?? Infinity));
+    }
+    if (sortOrder === 'desc') {
+      return [...results].sort((a, b) => (b.current_price ?? 0) - (a.current_price ?? 0));
+    }
+    return results;
+  }, [results, sortOrder]);
+
   return (
-    <div className="container">
-      <div className="blob blob-1"></div>
-      <div className="blob blob-2"></div>
+    <div className="min-h-screen bg-gray-50 font-inter">
 
-      <header className="header">
-        <h1 className="logo">SastaDost <span>PK</span></h1>
-        <div className="search-box">
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="Search mobile, laptops..."
-          />
-          <button onClick={handleSearch} disabled={loading}>
-            {loading ? "Searching..." : "Find Best Price"}
-          </button>
-        </div>
-      </header>
+      {/* Sticky Navigation */}
+      <Navbar />
 
-      <main className="results-grid">
-        {results.map((item, index) => (
-          <div key={index} className="glass-card">
+      {/* Search Hero */}
+      <SearchHero
+        query={query}
+        onQueryChange={setQuery}
+        onSearch={() => handleSearch()}
+        onChipClick={handleChipClick}
+        loading={loading}
+      />
 
-            <div className="card-badge">{item.store || 'Market'}</div>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-            <div className="image-container">
-              <img src={item.image_url || 'https://via.placeholder.com/150'} alt={item.title} />
+        {/* Skeleton Loader */}
+        {loading && <SkeletonGrid count={8} />}
+
+        {/* Error State */}
+        {!loading && error && (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h2 className="text-xl font-bold text-gray-700 mb-2">Connection Error</h2>
+            <p className="text-gray-500 text-sm max-w-md">{error}</p>
+            <button
+              onClick={() => handleSearch()}
+              className="mt-6 bg-brand-orange text-white font-semibold px-6 py-2.5 rounded-full hover:bg-brand-orange-dark transition-colors"
+            >
+              Retry Search
+            </button>
+          </div>
+        )}
+
+        {/* No Results State */}
+        {!loading && !error && hasSearched && sortedResults.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="text-6xl mb-4">🔍</div>
+            <h2 className="text-xl font-bold text-gray-700 mb-2">No results found</h2>
+            <p className="text-gray-500 text-sm">
+              Try searching for "{query}" with different keywords, or pick a trending item above.
+            </p>
+          </div>
+        )}
+
+        {/* Results Grid */}
+        {!loading && !error && sortedResults.length > 0 && (
+          <>
+            <SortDropdown
+              sortOrder={sortOrder}
+              onChange={setSortOrder}
+              resultCount={sortedResults.length}
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+              {sortedResults.map((item, index) => (
+                <ProductCard
+                  key={item.id || index}
+                  item={item}
+                  allResults={results}
+                />
+              ))}
             </div>
+          </>
+        )}
 
-            <div className="card-content">
-              <h3 className="product-title">{item.name}</h3>
-
-              {/* 2. Enhanced Pricing Section */}
-              <div className="price-section">
-                <div className="price-tag">
-                  <span className="currency">Rs.</span>
-                  <span className="amount">{item.current_price?.toLocaleString()}</span>
-                </div>
-
-                {item.discountTag && item.originalPrice && (
-                  <span className="original-price">
-                    Rs. {item.originalPrice.toLocaleString()}
-                  </span>
-                )}
+        {/* Initial Landing State (before first search) */}
+        {!loading && !hasSearched && (
+          <div className="py-16 text-center">
+            <div className="max-w-2xl mx-auto">
+              <div className="text-7xl mb-6">💡</div>
+              <h2 className="text-2xl font-black text-gray-800 mb-3">
+                How SastaDost Works
+              </h2>
+              <p className="text-gray-500 mb-10 text-base">
+                Search any product above and we'll instantly compare prices across Pakistan's top stores.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
+                {[
+                  { emoji: '🔍', title: 'Search', desc: 'Type any product — mobile, laptop, AC, anything.' },
+                  { emoji: '⚡', title: 'Compare', desc: 'We instantly pull prices from Daraz, PriceOye & more.' },
+                  { emoji: '💰', title: 'Save', desc: 'Click the lowest price and buy directly from the store.' },
+                ].map((step) => (
+                  <div key={step.title} className="bg-white rounded-2xl p-5 shadow-card border border-gray-50">
+                    <div className="text-3xl mb-3">{step.emoji}</div>
+                    <h3 className="font-bold text-gray-800 mb-1">{step.title}</h3>
+                    <p className="text-sm text-gray-500">{step.desc}</p>
+                  </div>
+                ))}
               </div>
-
-              {/* 3. Savings Callout */}
-              {item.savings > 0 && (
-                <p className="savings-alert">Save Rs. {item.savings.toLocaleString()}
-                  {/* 1. Discount Badge */}
-                  {item.discountTag && (
-                    <span className="discount-badge">{item.discountTag}</span>
-                  )}
-                </p>
-
-
-              )}
-
-              {/* 4. Improved Rating UI */}
-              {item.rating > 0 && (
-                <div className="rating">
-                  <span className="star">★</span> {item.rating}
-                  <span className="review-count">(reviews: {item.reviewCount || 0})</span>
-                </div>
-              )}
-
-              <p className="location">📍 {item.location || 'Pakistan'}</p>
-
-              <a href={item.product_url} target="_blank" rel="noreferrer" className="buy-btn">
-                View on {item.store}
-              </a>
             </div>
           </div>
-        ))}
+        )}
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-100 mt-16 py-8 text-center text-sm text-gray-400">
+        <p>
+          <span className="font-bold text-gray-600">SastaDost</span> — Pakistan's Price Comparison Engine &nbsp;🇵🇰
+        </p>
+        <p className="mt-1">Prices updated in real-time from Daraz & other top stores.</p>
+      </footer>
     </div>
   );
 }
