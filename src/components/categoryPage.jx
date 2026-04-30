@@ -1,0 +1,62 @@
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios'; // Ensure axios is installed: npm install axios
+
+const CategoryPage = () => {
+  const { id } = useParams(); // Get the sub-category ID from the URL
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        // Querying your server with the sub-category ID
+        const response = await axios.get(`http://localhost:5000/api/products/category/${id}`);
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching items:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [id]); // Re-run if the ID changes
+
+  if (loading) return <div className="text-center py-20 font-bold text-orange-500">Searching for deals...</div>;
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-10">
+      <h2 className="text-2xl font-black mb-8 text-gray-900">Items found for you</h2>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {products.map((item) => (
+          <div key={item._id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all overflow-hidden group">
+            <div className="h-48 bg-gray-50 overflow-hidden">
+              <img src={item.image} alt={item.title} className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform" />
+            </div>
+            <div className="p-5">
+              <h4 className="text-sm font-bold text-gray-800 line-clamp-2 h-10 mb-2">{item.title}</h4>
+              <div className="flex items-center justify-between mt-4">
+                <span className="text-orange-600 font-black text-lg">Rs. {item.price}</span>
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-gray-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg"
+                >
+                  View Detail
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {products.length === 0 && <p className="text-gray-400">No items found for this category.</p>}
+    </div>
+  );
+};
+
+export default CategoryPage;

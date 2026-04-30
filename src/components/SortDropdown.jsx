@@ -2,8 +2,10 @@ import React from 'react';
 
 const SORT_OPTIONS = [
   { value: 'default', label: '✨ Relevance' },
-  { value: 'asc',     label: '💰 Price: Low to High' },
-  { value: 'desc',    label: '💎 Price: High to Low' },
+  { value: 'asc', label: '💰 Price: Low to High' },
+  { value: 'desc', label: '💎 Price: High to Low' },
+  { value: 'rating_asc', label: '⭐ Rating: Low to High' },
+  { value: 'rating_desc', label: '⭐ Rating: High to Low' },
 ];
 
 const SortDropdown = ({ sortOrder, onChange, resultCount }) => {

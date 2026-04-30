@@ -47,6 +47,12 @@ function App() {
     if (sortOrder === 'desc') {
       return [...results].sort((a, b) => (b.current_price ?? 0) - (a.current_price ?? 0));
     }
+    if (sortOrder === 'rating_asc') {
+      return [...results].sort((a, b) => (a.rating_score ?? 0) - (b.rating_score ?? 0));
+    }
+    if (sortOrder === 'rating_desc') {
+      return [...results].sort((a, b) => (b.rating_score ?? 0) - (a.rating_score ?? 0));
+    }
     return results;
   }, [results, sortOrder]);
 
