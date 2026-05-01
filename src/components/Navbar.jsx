@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { categoryData } from '../categoriesData';
+import mainSymbol from '../assets/icons/_Main_symbol.png';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,7 +16,7 @@ const Navbar = () => {
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-200">
                 {/* <span className="text-white font-black text-lg">S</span> */}
-                <img style={{ borderRadius: '60%' }} src="./src/assets/icons/_Main symbol.png" alt="SasaDost Logo Image" />
+                <img style={{ borderRadius: '60%' }} src={mainSymbol} alt="SasaDost Logo Image" />
               </div>
               <div className="flex flex-col leading-none">
                 <span className="text-xl font-black text-gray-900 tracking-tight">
