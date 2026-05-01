@@ -6,6 +6,7 @@ import SearchHero from './components/SearchHero';
 import ProductCard from './components/ProductCard';
 import { SkeletonGrid } from './components/SkeletonCard';
 import SortDropdown from './components/SortDropdown';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const [query, setQuery] = useState('');
@@ -23,7 +24,8 @@ function App() {
     setHasSearched(true);
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/search?q=${encodeURIComponent(q)}`
+        // `http://localhost:5000/api/search?q=${encodeURIComponent(q)}`
+        `${API_BASE_URL}/api/search?q=${encodeURIComponent(q)}`
       );
       setResults(Array.isArray(response.data) ? response.data : []);
     } catch (err) {

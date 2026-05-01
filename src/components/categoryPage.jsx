@@ -12,7 +12,8 @@ const CategoryPage = () => {
       setLoading(true);
       try {
         // Querying your server with the sub-category ID
-        const response = await axios.get(`http://localhost:5000/api/products/category/${id}`);
+        // const response = await axios.get(`http://localhost:5000/api/products/category/${id}`);
+        const response = await axios.get(`${API_BASE_URL}/api/products/category/${id}`);
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching items:", error);
