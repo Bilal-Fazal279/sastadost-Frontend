@@ -25,7 +25,7 @@ function App() {
     try {
       const response = await axios.get(
         // `http://localhost:5000/api/search?q=${encodeURIComponent(q)}`
-        `${API_BASE_URL}/api/search?q=${encodeURIComponent(q)}`
+        `${API_BASE_URL}api/search?q=${encodeURIComponent(q)}`
       );
       setResults(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
