@@ -15,13 +15,9 @@ const Navbar = () => {
           <a href="/" className='cursor-pointer'>
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-200">
-<<<<<<< HEAD
-                 {/* <span className="text-white font-black text-lg">S</span> */}
                 <img style={{ borderRadius: '60%' }} src="./src/assets/icons/_Main_symbol.png" alt="SasaDost Logo Image" />
-=======
                 {/* <span className="text-white font-black text-lg">S</span> */}
                 <img style={{ borderRadius: '60%' }} src={mainSymbol} alt="SasaDost Logo Image" />
->>>>>>> 4ce24ca11f64d48488af3e7595edfa0f07f2ecee
               </div>
               
 
