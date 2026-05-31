@@ -113,16 +113,36 @@ const ProductCard = ({ item, allResults }) => {
           {sameProducts.slice(0, 3).map((r, i) => {
             const isLowest = r.current_price === lowestPrice;
             return (
-              <div key={i} className={`flex items-center justify-between text-xs rounded-lg px-2 py-1 ${isLowest ? 'bg-green-50' : ''}`}>
+              // <div key={i} className={`flex items-center justify-between text-xs rounded-lg px-2 py-1 ${isLowest ? 'bg-green-50' : ''}`}>
+              //   <span className="flex items-center gap-1.5 text-gray-500">
+              //     <span>{getPlatformEmoji(r.store)}</span>
+              //     <span>{getPlatformLabel(r.store)}</span>
+              //   </span>
+              //   <span className={`font-bold ${isLowest ? 'text-green-600' : 'text-gray-700'}`}>
+              //     Rs. {r.current_price?.toLocaleString()}
+              //     {isLowest && <span className="ml-1 text-[8px] bg-green-600 text-white px-1 py-0.5 rounded-full">BEST</span>}
+              //   </span>
+              // </div>
+
+
+              <a
+                key={i}
+                href={r.product_url} // Maps to your database URL column
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center justify-between text-xs rounded-lg px-2 py-1 transition-colors hover:bg-gray-50 ${isLowest ? 'bg-green-50 hover:bg-green-100' : ''
+                  }`}
+              >
                 <span className="flex items-center gap-1.5 text-gray-500">
                   <span>{getPlatformEmoji(r.store)}</span>
                   <span>{getPlatformLabel(r.store)}</span>
                 </span>
-                <span className={`font-bold ${isLowest ? 'text-green-600' : 'text-gray-700'}`}>
+                <span className={`font-bold flex items-center ${isLowest ? 'text-green-600' : 'text-gray-700'}`}>
                   Rs. {r.current_price?.toLocaleString()}
-                  {isLowest && <span className="ml-1 text-[8px] bg-green-600 text-white px-1 py-0.5 rounded-full">BEST</span>}
+                  {isLowest && <span className="ml-1 text-[8px] bg-green-600 text-white px-1 py-0.5 rounded-full font-normal">BEST</span>}
                 </span>
-              </div>
+              </a>
+
             );
           })}
 
@@ -166,11 +186,22 @@ const ProductCard = ({ item, allResults }) => {
           {showHistory ? '▲ Hide Price History' : '▼ View Price History'}
         </button>
 
+        
         {showHistory && (
+          <div className="mt-1 transition-all duration-300">
+            <PriceHistory
+              currentPrice={item.current_price}
+              dbHistory={item.price_history} // Pass the real tracking array from the DB subquery
+              productName={item.name}
+            />
+          </div>
+        )}
+
+        {/* {showHistory && (
           <div className="mt-1 transition-all duration-300">
             <PriceHistory currentPrice={item.current_price} productName={item.name} />
           </div>
-        )}
+        )} */}
 
         {/* CTA */}
         <a
