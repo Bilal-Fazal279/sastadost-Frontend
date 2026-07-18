@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const TRENDING = [
   'Samsung Galaxy S24',
@@ -12,8 +13,29 @@ const TRENDING = [
 ];
 
 const SearchHero = ({ query, onQueryChange, onSearch, onChipClick, loading }) => {
+  const navigate = useNavigate();
+
+  const handleSearchClick = () => {
+    const trimmedQuery = query ? query.trim() : '';
+    if (!trimmedQuery) return;
+
+    // Simple Regex to check if input is a URL
+    const isUrl = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/i.test(trimmedQuery);
+
+    if (isUrl) {
+      // Encode the URL so it safely passes through the query parameters
+      navigate(`/product?url=${encodeURIComponent(trimmedQuery)}`);
+    } else {
+      // Fallback to your current search results card page
+      navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
+      
+      // Call parent search logic if needed for triggers/logging
+      if (onSearch) onSearch();
+    }
+  };
+
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') onSearch();
+    if (e.key === 'Enter') handleSearchClick();
   };
 
   return (
@@ -47,15 +69,15 @@ const SearchHero = ({ query, onQueryChange, onSearch, onChipClick, loading }) =>
           />
           <button
             id="main-search-btn"
-            onClick={onSearch}
+            onClick={handleSearchClick}
             disabled={loading}
             className="bg-brand-orange hover:bg-brand-orange-dark disabled:opacity-60 text-white font-bold px-6 py-3 rounded-xl transition-all active:scale-95 whitespace-nowrap text-sm sm:text-base"
           >
             {loading ? (
               <span className="flex items-center gap-2">
                 <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                 </svg>
                 Searching...
               </span>

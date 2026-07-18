@@ -14,10 +14,11 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white border border-gray-100 rounded-xl shadow-lg px-3 py-2 text-sm">
-        <p className="font-bold text-gray-700">{label}</p>
         <p className="text-orange-500 font-semibold">
           Rs. {payload[0].value?.toLocaleString()}
         </p>
+        {/* <p className="font-bold text-gray-700 ">{label}</p> */}
+        <p className="text-gray-400 font-medium text-[11px] leading-tight mt-0.5">{label}</p>
       </div>
     );
   }
@@ -37,8 +38,8 @@ const PriceHistory = ({ dbHistory = [], currentPrice }) => {
     });
 
     return {
-      month: formattedDate,
-      price: parseFloat(item.price) // Guarantees math parsing safety
+      price: parseFloat(item.price), // Guarantees math parsing safety
+      month: formattedDate
     };
   });
 

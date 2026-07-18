@@ -148,7 +148,7 @@ const ProductCard = ({ item, allResults }) => {
 
           {/* Trust Indicators */}
           <div className="flex justify-between items-center pt-2 border-t border-gray-200 mt-1">
-            <span className='text-[10px] font-bold text-gray-400 uppercase'>📦 {item.item_sold_count || '0 SOLD'}</span>
+            <span className='text-[10px] font-bold text-gray-400 uppercase'>📦 {item.item_sold_count || '0 SOLD'} </span>
             <span className='text-[10px] font-bold text-gray-400 uppercase'>📍 {item.location || 'No Location'}</span>
           </div>
         </div>
@@ -168,7 +168,7 @@ const ProductCard = ({ item, allResults }) => {
               )}
             </div>
           ) : (
-            <span className="text-[10px] text-gray-400 italic">No ratings</span>
+            <span className="text-[10px] text-gray-400 italic">No Ratings</span>
           )}
 
           {savings > 0 && (
